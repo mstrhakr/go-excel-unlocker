@@ -32,4 +32,3 @@ jobs:
           name: go-excel-unlocker-windows-amd64
           path: bin/go-excel-unlocker.exe
           if-no-files-found: error
-
