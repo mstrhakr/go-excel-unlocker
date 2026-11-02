@@ -1,0 +1,33 @@
+name: Release Windows executable
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+      - run: go test -race ./...
+      - run: go vet ./...
+      - name: Build Windows GUI
+        run: go build -trimpath -ldflags="-s -w -H=windowsgui" -o bin/go-excel-unlocker.exe ./cmd/go-excel-unlocker
+      - name: Publish executable and checksum
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $hash = (Get-FileHash bin/go-excel-unlocker.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  go-excel-unlocker.exe" | Set-Content -Encoding ascii bin/SHA256SUMS.txt
+          gh release create "$env:GITHUB_REF_NAME" bin/go-excel-unlocker.exe bin/SHA256SUMS.txt --verify-tag --generate-notes --repo "$env:GITHUB_REPOSITORY"
