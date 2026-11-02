@@ -25,6 +25,13 @@ profile.cov
 go.work
 go.work.sum
 
+# Local builds and workbooks (never commit user data)
+/bin/
+*.xlsx
+*.xlsm
+*.xls
+*.tmp
+
 # env file
 .env
 
