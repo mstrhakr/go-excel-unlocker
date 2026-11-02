@@ -1,6 +1,6 @@
 # go-excel-unlocker
 
-A small, Windows-only native desktop application for removing worksheet and
+A small, native Windows 10/11 (64-bit) desktop application for removing worksheet and
 workbook structure protection from `.xlsx` and `.xlsm` files. Single-file
 workflow; all processing stays on your computer. No uploads, telemetry,
 external services, password cracking, or macro execution.
@@ -46,6 +46,12 @@ Archive paths are never extracted to disk. A temporary file in the destination
 directory is validated before finalization and cleaned up on failure or cancellation.
 This tool does not evaluate formulas or remove other access controls.
 
+Resource ceilings are 256 MiB compressed input, 512 MiB total expanded data,
+64 MiB per archive entry, 16 MiB per XML part, 10,000 entries, XML nesting
+depth 256, 1,024 attributes per element, and 256 in-scope namespaces.
+Oversized workbooks are refused rather than partially processed. UTF-8 (with or
+without BOM) and UTF-16 XML are supported without changing the source encoding.
+
 Keep backups and review important outputs in Excel. The executable is not
 code-signed; Windows may display SmartScreen warnings. Only process files you
 are authorized to modify.
@@ -72,6 +78,11 @@ Cross-build from Linux:
 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags="-s -w -H=windowsgui" -o bin/go-excel-unlocker.exe ./cmd/go-excel-unlocker
 GOOS=windows GOARCH=amd64 go vet ./...
 ```
+
+The checked-in Windows resource objects embed only the application-owned
+`cmd/go-excel-unlocker/app.manifest` (Common Controls v6; no administrator
+privileges requested). They require no resource compiler for normal builds.
+Resource regeneration commands are recorded in `main_windows.go`.
 
 The independent engine in `internal/unlock` is tested using generated synthetic
 archives, not user workbooks. CI runs tests and vet on Linux and Windows and
