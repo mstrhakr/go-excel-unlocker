@@ -42,12 +42,14 @@ not guaranteed byte-identical.
 File signatures, OOXML structure, XML, and the final output are validated.
 Encrypted ZIP entries, signed Office packages (edits would invalidate their
 signatures), malformed files, and archives exceeding resource limits are refused.
+Ambiguous ZIP directory layouts are also refused rather than guessed.
 Archive paths are never extracted to disk. A temporary file in the destination
 directory is validated before finalization and cleaned up on failure or cancellation.
 This tool does not evaluate formulas or remove other access controls.
 
 Resource ceilings are 256 MiB compressed input, 512 MiB total expanded data,
-64 MiB per archive entry, 16 MiB per XML part, 10,000 entries, XML nesting
+64 MiB per archive entry, 16 MiB per XML part, 32 MiB for the ZIP central
+directory, 10,000 entries, XML nesting
 depth 256, 1,024 attributes per element, and 256 in-scope namespaces.
 Oversized workbooks are refused rather than partially processed. UTF-8 (with or
 without BOM) and UTF-16 XML are supported without changing the source encoding.
